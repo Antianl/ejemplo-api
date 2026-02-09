@@ -10,6 +10,24 @@ const redis = new Redis(process.env.REDIS_URL || {
 const server = restify.createServer({ name: 'ejemplo-api'});
 server.use(restify.plugins.bodyParser());
 
+//Handle OPTIONS REQUEST FOR CORS
+server.opts('/*', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.send(200);
+    return next();
+});
+
+// CORS headers para todas las respuestas
+server.pre((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return next();
+});
+
+// POST /data - guarda un valor en Redis
 server.post('/data', async (req, res) => {
     try {
         const payload = req.body || {}
